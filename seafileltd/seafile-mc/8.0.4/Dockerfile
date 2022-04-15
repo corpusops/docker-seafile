@@ -1,3 +1,34 @@
+FROM seafileltd/seafile-mc:8.0.4
+ARG DO_UPDATE=y
+ARG NONINTERACTIVE=y
+ARG INSTALL_DEFAULT_LOCALE="fr_FR.UTF-8"
+ARG EXTRA_FILES_LIST=""
+ARG COPS_SYSTEM=${_cops_SYSTEM}
+ARG FOREGO_RELEASE=latest
+ARG REMCO_RELEASE=latest
+ARG GOSU_RELEASE=latest
+ARG DOCKERIZE_RELEASE=latest
+ARG CURL_SSL_OPTS=--tlsv1
+ARG DOCKER_IMAGES_COMMIT=master
+ARG COPS_HELPERS=/cops_helpers
+ADD \
+    helpers/up.sh \
+    helpers/add_gosu.sh \
+    helpers/system_detect.sh \
+    helpers/add_frep.sh \
+    helpers/add_confd.sh \
+    helpers/add_dockerize.sh \
+    helpers/add_forego.sh \
+    helpers/add_opt_pkgs.sh \
+    helpers/add_remco.sh \
+    helpers/setup_locales.sh \
+    helpers/cops_pkgmgr_install.sh \
+    helpers/*_up.sh \
+    helpers/*_clean.sh \
+    rootfs/ \
+    packages/*packages*.txt \
+    ${EXTRA_FILES_LIST} \
+    /tmp/corpusopssteroids/
 RUN sh -c 'set -ex \
     && cd /tmp/corpusopssteroids \
     && : \
@@ -28,3 +59,13 @@ RUN sh -c 'set -ex \
     '
 COPY --from=ochinchina/supervisord:latest \
     /usr/local/bin/supervisord /bin/supervisord-go
+RUN sh -c ': \
+    && apt-get -yqq update && apt-get install -yqq syslog-ng-core && apt-get -yqq clean'
+ADD helpers/*_clean.sh /tmp/corpusopssteroids/
+RUN sh -c 'set -ex \
+    && cd /tmp/corpusopssteroids \
+    && chmod +x *sh \
+    && _cops_SYSTEM=$(./system_detect.sh) \
+    && ./${_cops_SYSTEM}_clean.sh \
+    && cd / && rm -rf /tmp/corpusopssteroids'
+LABEL com.github.corpusops.docker-images-commit="$DOCKER_IMAGES_COMMIT"
