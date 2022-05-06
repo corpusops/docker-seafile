@@ -1,4 +1,4 @@
-FROM seafileltd/seafile-mc:8.0.3
+FROM seafileltd/seafile-mc:9.0.3
 ARG DO_UPDATE=y
 ARG NONINTERACTIVE=y
 ARG INSTALL_DEFAULT_LOCALE="fr_FR.UTF-8"
