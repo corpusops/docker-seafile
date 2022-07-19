@@ -63,9 +63,12 @@ RUN sh -c ': \
     && apt-get -yqq update && apt-get install -yqq syslog-ng-core && apt-get -yqq clean'
 ADD helpers/*_clean.sh /tmp/corpusopssteroids/
 RUN sh -c 'set -ex \
+    && echo fixperms >&2 \
+    && ( chmod -vf g-wx,o-wx /etc/logrotate.d/* /etc/logrotate.conf || true ) \
+    && echo cleanup >&2 \
     && cd /tmp/corpusopssteroids \
     && chmod +x *sh \
     && _cops_SYSTEM=$(./system_detect.sh) \
     && ./${_cops_SYSTEM}_clean.sh \
-    && cd / && rm -rf /tmp/corpusopssteroids'
+    && cd / && rm -rf /tmp/corpusopssteroids /var/cache/apk/* /var/lib/apt/lists/*'
 LABEL com.github.corpusops.docker-images-commit="$DOCKER_IMAGES_COMMIT"

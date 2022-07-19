@@ -12,9 +12,25 @@ DCRON_ARGS=${DCRON_ARGS:-"-b -l $DCRON_VERBOSE -S -f"}
 CRONIE_ARGS=${CRONIE_ARGS:-"-n -s"}
 CRON_CMD=${CRON_CMD-}
 CRON_IMPLEMENTATION=${CRON_IMPLEMENTATION-}
+LOGROTATE_DAYS=${LOGROTATE_DAYS:-30}
+LOGROTATE_SIZE=${LOGROTATE_SIZE:-5M}
 # update default values of PAM environment variables (used by CRON scripts)
 if [ -e /etc/pam.d/cron ];then
     sed -i -re "s/^session    required     pam_loginuid.so/#session    required   pam_loginuid.so/g" /etc/pam.d/cron
+fi
+logrotateconf=/etc/logrotate.d/rsyslog
+fixlogrotateconf() {
+    if [  ! -e $1 ];then return;fi
+    if [ "x${2-}" != "x" ];then shift;fi
+    chmod -v g-wx,o-wx $@
+}
+if [ -e $logrotateconf ];then
+    sed -i -r \
+        -e "s/rotate [0-9]+/rotate $LOGROTATE_DAYS/g" \
+        -e "s/size .*/size $LOGROTATE_SIZE/g" \
+        $logrotateconf
+    fixlogrotateconf /etc/logrotate.d "/etc/logrotate.d/*"
+    fixlogrotateconf /etc/logrotate.conf
 fi
 if [ -e /etc/security/pam_env.conf ];then
     env | grep -- = | while read -r line; do  # read STDIN by line
