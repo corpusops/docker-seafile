@@ -65,11 +65,11 @@ jobs:
       fail-fast: false
       matrix:
         IMAGES:
-        - "seafileltd/seafile-mc/7.1.3 seafileltd/seafile-mc/7.1.4 seafileltd/seafile-mc/7.1.5 seafileltd/seafile-mc/8.0.3 seafileltd/seafile-mc/latest"
+        - "seafileltd/seafile-mc/9.0.4 seafileltd/seafile-mc/latest"
         #- "corpusops/test/a corpusops/test/b corpusops/test/c"
         # all images that werent explicitly told to be built would be built in the next batches
         # we span them onto N jobs
-        - "corpusops/seafileltd-seafile-mc:9.0.4"
+        - "corpusops/seafileltd-seafile-mc/9.0.4"
         - "zleftover:1/1"
 on:
   push:
