@@ -281,7 +281,7 @@ NODE_TOP="$(echo $(find_top_node))"
 MAILU_VERSiON=1.7
 
 BATCHED_IMAGES="\
-seafileltd/seafile-mc/9.0.4\
+seafileltd/seafile-mc/9.0.6\
  seafileltd/seafile-mc/latest::7
 "
 SKIP_REFRESH_ANCESTORS=${SKIP_REFRESH_ANCESTORS-}
