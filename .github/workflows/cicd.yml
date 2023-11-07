@@ -56,7 +56,7 @@ jobs:
              rm -f */*/*/Dockerfile&&${{steps.v.outputs.silent}} ./refresh_images.sh;
              fi
       - name: build & release
-        run: set -e;
+        run: set -ex;
              if [ "x${{steps.v.outputs.releasable}}" = "xtrue" ];then export DO_RELEASE=1;fi;
              ./build.sh $IMAGES
 # ${{steps.v.outputs.silent}} ./build.sh $IMAGES
