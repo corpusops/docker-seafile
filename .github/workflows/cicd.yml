@@ -65,7 +65,7 @@ jobs:
       fail-fast: false
       matrix:
         IMAGES:
-        - "seafileltd/seafile-mc/11.0.1 seafileltd/seafile-mc/latest"
+        - "seafileltd/seafile-mc/11.0.6 seafileltd/seafile-mc/latest"
         #- "corpusops/test/a corpusops/test/b corpusops/test/c"
         # all images that werent explicitly told to be built would be built in the next batches
         # we span them onto N jobs
