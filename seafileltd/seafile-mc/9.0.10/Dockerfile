@@ -1,4 +1,4 @@
-FROM seafileltd/seafile-mc:9.0.3 AS final
+FROM seafileltd/seafile-mc:9.0.10 AS final
 ARG DO_UPDATE=y
 ARG NONINTERACTIVE=y
 ARG DEBIAN_FRONTEND=noninteractive

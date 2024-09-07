@@ -1,6 +1,7 @@
-FROM seafileltd/seafile-mc:7.1.4
+FROM seafileltd/seafile-mc:7.1.4 AS final
 ARG DO_UPDATE=y
 ARG NONINTERACTIVE=y
+ARG DEBIAN_FRONTEND=noninteractive
 ARG INSTALL_DEFAULT_LOCALE="fr_FR.UTF-8"
 ARG EXTRA_FILES_LIST=""
 ARG COPS_SYSTEM=${_cops_SYSTEM}
@@ -61,7 +62,7 @@ COPY --from=ochinchina/supervisord:latest \
     /usr/local/bin/supervisord ${COPS_HELPERS}/supervisord-go
 RUN sh -c ': \
     && apt-get -yqq update && apt-get install -yqq syslog-ng-core && apt-get -yqq clean'
-ADD helpers/*_clean.sh /tmp/corpusopssteroids/
+ADD helpers/system_detect.sh helpers/*_clean.sh /tmp/corpusopssteroids/
 RUN sh -c 'set -ex \
     && echo fixperms >&2 \
     && ( chmod -vf g-wx,o-wx /etc/logrotate.d/* /etc/logrotate.conf || true ) \
