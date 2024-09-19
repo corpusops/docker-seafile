@@ -56,7 +56,7 @@ jobs:
              rm -f */*/*/Dockerfile&&${{steps.v.outputs.silent}} ./refresh_images.sh;
              fi
       - name: build & release
-        run: set -ex;
+        run: set -e;
              if [ "x${{steps.v.outputs.releasable}}" = "xtrue" ];then export DO_RELEASE=1;fi;
              ./build.sh $IMAGES
 # ${{steps.v.outputs.silent}} ./build.sh $IMAGES
@@ -65,7 +65,7 @@ jobs:
       fail-fast: false
       matrix:
         IMAGES:
-        - "seafileltd/seafile-mc/11.0.12 seafileltd/seafile-mc/latest"
+        - "seafileltd/seafile-mc/11.0.12 seafileltd/seafile-mc/11.0.6"
         #- "corpusops/test/a corpusops/test/b corpusops/test/c"
         # all images that werent explicitly told to be built would be built in the next batches
         # we span them onto N jobs
