@@ -256,16 +256,20 @@ SKIP_TF="(tensorflow.serving:[0-9].*)"
 SKIP_MINIO="(k8s-operator|((minio|mc):(RELEASE.)?[0-9]{4}-.{7}))"
 SKIP_MAILU="(mailu.*(feat|patch|merg|refactor|revert|upgrade|fix-|pr-template))"
 SKIP_DOCKER="docker(\/|:)([0-9]+\.[0-9]+\.|17|18.0[1-6]|1$|1(\.|-)).*"
-
-SKIPPED_TAGS="seafile-mc:7.0|-arm$|11.0.1$|10.0.1|11.0.11|11.0.0|11.0.10|11.0.2|11.0.3|11.0.4|11.0.5|11.0.7|11.0.8|11.0.9|7.1.4|8.0.3|8.0.4|8.0.5|8.0.6|8.0.7|9.0.0|9.0.1|9.0.2|9.0.3|9.0.4|9.0.5|9.0.6|9.0.7|9.0.8|9.0.9"
+SKIPPED_TAGS="$SKIP_TF|$SKIP_MINOR_OS|$SKIP_NODE|$SKIP_DOCKER|$SKIP_MINIO|$SKIP_MAILU|$SKIP_MINOR|$SKIP_PRE|$SKIP_OS|$SKIP_PHP|$SKIP_WINDOWS|$SKIP_MISC"
 CURRENT_TS=$(date +%s)
-IMAGES_SKIP_NS=""
+IMAGES_SKIP_NS="((mailhog|postgis|pgrouting(-bare)?|^library|dejavu|(minio/(minio|mc))))"
+
+SEAFILE_SKIPPED_TAGS="seafile-mc:((.*-arm$)|7.0|11.0.1$|10.0.1|11.0.11|11.0.0|11.0.10|11.0.2|11.0.3|11.0.4|11.0.5|11.0.7|11.0.8|11.0.9|7.1.4|8.0.3|8.0.4|8.0.5|8.0.6|8.0.7|9.0.0|9.0.1|9.0.2|9.0.3|9.0.4|9.0.5|9.0.6|9.0.7|9.0.8|9.0.9)"
+SKIPPED_TAGS="$SEAFILE_SKIPPED_TAGS"
+PROTECTED_VERSIONS="$ES_PROTECTED_VERSIONS"
 
 
 default_images="
 seafileltd/seafile-mc
 "
-ONLY_ONE_MINOR="postgres|elasticsearch|nginx"
+ONLY_ONE_MINOR="postgres|nginx|opensearch|elasticsearch"
+PROTECTED_TAGS="corpusops/rsyslog"
 
 find_top_node_() {
     img=library/node
@@ -479,6 +483,10 @@ gen_image() {
 is_skipped() {
     local ret=1 t="$@"
     if [[ -z $SKIPPED_TAGS ]];then return 1;fi
+    if [[ -n "${PROTECTED_VERSIONS}" ]] && ( echo "$t" | grep -E -q "$PROTECTED_VERSIONS" );then
+        debug "$t is protected, no skip"
+        return 1
+    fi
     if ( echo "$t" | grep -E -q "$SKIPPED_TAGS" );then
         ret=0
     fi
@@ -555,7 +563,7 @@ get_image_tags() {
     changed=
     if [[ "x${ONLY_ONE_MINOR}" != "x" ]] && ( echo $n | grep -E -q "$ONLY_ONE_MINOR" );then
         oomt=""
-        for ix in $(seq 0 30);do
+        for ix in $(seq 0 99);do
             if ! ( echo "$atags" | grep -E -q "^$ix\." );then continue;fi
             for j in $(seq 0 99);do
                 if ! ( echo "$atags" | grep -E -q "^$ix\.${j}\." );then continue;fi
@@ -578,10 +586,12 @@ get_image_tags() {
                     fi
                     if [[ -n "$selected" ]];then
                         for l in $(echo "$selected"|sed -e "$ d");do
-                            if [[ -z $oomt ]];then
-                                oomt="$l$"
-                            else
-                                oomt="$oomt|$l"
+                            if [[ -z "${PROTECTED_VERSIONS}" ]] || ! ( echo "$n:$l" | grep "${PROTECTED_VERSIONS}" );then
+                                if [[ -z $oomt ]];then
+                                    oomt="$l$"
+                                else
+                                    oomt="$oomt|$l"
+                                fi
                             fi
                         done
                     fi
@@ -594,7 +604,7 @@ get_image_tags() {
     fi
     if [[ -z ${SKIP_TAGS_REBUILD} ]];then
         rm -f "$t"
-        filter_tags "$atags" > $t
+        filter_tags "$atags" > "$t"
     fi
     set -e
     if [ -e "$t" ];then cat "$t";fi
