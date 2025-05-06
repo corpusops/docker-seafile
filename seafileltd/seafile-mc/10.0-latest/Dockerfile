@@ -1,6 +1,6 @@
-ARG ANCESTOR=seafileltd/seafile-mc:10.0.1
+ARG ANCESTOR=seafileltd/seafile-mc:10.0-latest
 ARG RSYNC=corpusops/rsync
-FROM seafileltd/seafile-mc:10.0.1 AS final
+FROM seafileltd/seafile-mc:10.0-latest AS final
 ARG DO_UPDATE=y
 ARG NONINTERACTIVE=y
 ARG DEBIAN_FRONTEND=noninteractive
