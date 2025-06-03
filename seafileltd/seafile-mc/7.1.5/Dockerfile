@@ -14,6 +14,7 @@ ARG DOCKERIZE_RELEASE=latest
 ARG CURL_SSL_OPTS=--tlsv1
 ARG DOCKER_IMAGES_COMMIT=master
 ARG COPS_HELPERS=/cops_helpers
+RUN apt-key adv --keyserver keyserver.ubuntu.com --refresh-keys
 ADD \
     helpers/up.sh \
     helpers/add_gosu.sh \
